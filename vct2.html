@@ -1,0 +1,2644 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Victorian Personality Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Cinzel:wght@400;600;700&amp;family=Pinyon+Script&amp;display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+    :root {
+      --color-bg-dark: #120c09;
+      --color-bg-panel: #1a120d;
+      --color-gold: #b88643;
+      --color-gold-dim: #8a6230;
+      --color-gold-bright: #d4a654;
+      --color-text-cream: #e8dcc8;
+      --color-text-muted: #c9b99a;
+
+      --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.8);
+      --border-double: 3px double rgba(184, 134, 67, 0.4);
+      --ornament-font: 'Playfair Display', serif;
+    }
+
+    body {
+      box-sizing: border-box;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+      background: var(--color-bg-dark);
+      color: var(--color-text-cream);
+      line-height: 1.7;
+      font-size: 18px;
+      overflow: hidden;
+    }
+
+    /* --- Dynamic Living Background System --- */
+
+    .background-stage {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background-color: var(--color-bg-dark);
+    }
+
+    /* 1. Visual Layers (Paintings/Videos) */
+    .scene-layer {
+      position: absolute;
+      inset: -5%;
+      width: 110%;
+      height: 110%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 3s ease-in-out;
+      filter: sepia(0.6) contrast(1.1) brightness(0.4) saturate(0.8);
+      z-index: 1;
+    }
+
+    .scene-layer.active {
+      opacity: 1;
+      animation: breatheMove 40s infinite alternate ease-in-out;
+    }
+
+    /* Victorian Slideshow Background for Landing Page */
+    #landingBackground {
+      position: absolute;
+      inset: 0;
+      z-index: 9;
+      overflow: hidden;
+    }
+
+    /* Individual slideshow images with elegant transitions */
+    .slideshow-image {
+      position: absolute;
+      inset: -5%;
+      width: 110%;
+      height: 110%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      /* Filters for Victorian aesthetic */
+      filter: sepia(0.3) contrast(1.1) brightness(0.85) saturate(0.9);
+      /* Extremely slow, luxurious crossfade - 12 seconds */
+      transition: opacity 12s cubic-bezier(0.25, 0.1, 0.25, 1),
+        transform 12s cubic-bezier(0.25, 0.1, 0.25, 1);
+      transform: scale(1);
+      z-index: 1;
+      will-change: opacity, transform;
+    }
+
+    .slideshow-image.active {
+      opacity: 0.55;
+      /* Ken Burns slow zoom - visible during the 2.5 second display */
+      animation: kenBurnsZoom 2.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+      z-index: 2;
+    }
+
+    .slideshow-image.fading-out {
+      opacity: 0 !important;
+      transform: scale(1.01);
+      z-index: 3;
+      transition: opacity 12s cubic-bezier(0.25, 0.1, 0.25, 1),
+        transform 12s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    @keyframes kenBurnsZoom {
+      0% {
+        transform: scale(1);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 0.55;
+      }
+
+      85% {
+        opacity: 0.55;
+        transform: scale(1.01);
+      }
+
+      100% {
+        transform: scale(1.01);
+        opacity: 0.55;
+      }
+    }
+
+    /* Dark gradient overlay for text readability */
+    #landingBackground::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(18, 12, 9, 0.1), rgba(18, 12, 9, 0.4));
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #landingBackground.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes breatheMove {
+      0% {
+        transform: scale(1) translate(0, 0);
+      }
+
+      33% {
+        transform: scale(1.05) translate(-1%, 1%);
+      }
+
+      66% {
+        transform: scale(1.02) translate(1%, -1%);
+      }
+
+      100% {
+        transform: scale(1.08) translate(0, 2%);
+      }
+    }
+
+    /* 2. Texture Overlays (Grain, Scratches) */
+    .overlay-grain {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity: 0.6;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    /* 3. Vignette & Atmosphere */
+    .overlay-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(18, 12, 9, 0.4) 0%, rgba(10, 5, 2, 0.95) 90%);
+      pointer-events: none;
+      z-index: 7;
+    }
+
+    /* 4. Particle Effects (Dust Motes) */
+    .particles-container {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(200, 180, 140, 0.3);
+      border-radius: 50%;
+      box-shadow: 0 0 5px rgba(200, 180, 140, 0.2);
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+
+      20% {
+        opacity: 0.5;
+      }
+
+      80% {
+        opacity: 0.5;
+      }
+
+      100% {
+        transform: translateY(-10vh) translateX(20px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* --- Foreground Content --- */
+
+    .app-container {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      z-index: 20;
+    }
+
+    .content-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      position: relative;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* --- Ornamental Frames & UI --- */
+
+    .ornate-border {
+      position: relative;
+      border: 1px solid rgba(184, 134, 67, 0.3);
+      padding: 4px;
+      background: rgba(18, 12, 9, 0.7);
+      backdrop-filter: blur(2px);
+    }
+
+    .ornate-border::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 2px solid rgba(184, 134, 67, 0.2);
+    }
+
+    /* Corner flourishes using CSS gradients */
+    .corner-flourish {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      border: 2px solid var(--color-gold);
+      transition: all 0.5s ease;
+      opacity: 0.6;
+    }
+
+    .corner-flourish.top-left {
+      top: -2px;
+      left: -2px;
+      border-right: none;
+      border-bottom: none;
+      border-radius: 12px 0 0 0;
+    }
+
+    .corner-flourish.top-right {
+      top: -2px;
+      right: -2px;
+      border-left: none;
+      border-bottom: none;
+      border-radius: 0 12px 0 0;
+    }
+
+    .corner-flourish.bottom-left {
+      bottom: -2px;
+      left: -2px;
+      border-right: none;
+      border-top: none;
+      border-radius: 0 0 0 12px;
+    }
+
+    .corner-flourish.bottom-right {
+      bottom: -2px;
+      right: -2px;
+      border-left: none;
+      border-top: none;
+      border-radius: 0 0 12px 0;
+    }
+
+    /* --- Typography & Elements --- */
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      color: var(--color-gold);
+      text-transform: uppercase;
+    }
+
+    .script-text {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 1.8em;
+      color: var(--color-text-muted);
+      text-transform: none;
+    }
+
+    .hero-header {
+      text-align: center;
+      padding: 80px 40px;
+      margin-bottom: 60px;
+      position: relative;
+
+      /* --- UPDATED: Subtle Black Gradient Overlay --- */
+      /* Blends from dark sepia-black to charcoal black */
+      background: linear-gradient(to bottom, rgba(20, 15, 12, 0.85) 0%, rgba(0, 0, 0, 0.95) 100%);
+
+      border: 1px solid rgba(184, 134, 67, 0.2);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-header::after {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(184, 134, 67, 0.3);
+      outline: 1px solid rgba(184, 134, 67, 0.1);
+      outline-offset: -4px;
+      pointer-events: none;
+    }
+
+    /* --- HERO TITLE STYLE --- */
+    .hero-title {
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      letter-spacing: -2px;
+
+      /* --- UPDATED: Tighter Line Spacing --- */
+      line-height: 0.9;
+
+      margin-bottom: 0.5em;
+
+      /* Solid Gold Color */
+      color: var(--color-gold);
+
+      /* Standard Text Shadow */
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+
+      position: relative;
+      display: inline-block;
+      padding: 0 40px;
+    }
+
+    .hero-title::before,
+    .hero-title::after {
+      content: '❧';
+      font-family: var(--ornament-font);
+      font-size: 0.6em;
+      color: var(--color-gold-dim);
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .hero-title::before {
+      left: 0;
+    }
+
+    .hero-title::after {
+      right: 0;
+      transform: translateY(-50%) scaleX(-1);
+    }
+
+    .hero-divider {
+      height: 2px;
+      width: 150px;
+      background: radial-gradient(ellipse at center, var(--color-gold), transparent 80%);
+      margin: 20px auto 30px;
+      position: relative;
+    }
+
+    .hero-divider::after {
+      content: '❖';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--color-bg-dark);
+      padding: 0 10px;
+      color: var(--color-gold);
+      font-size: 14px;
+    }
+
+    .hero-description {
+      font-size: 1.4rem;
+      max-width: 800px;
+      margin: 0 auto 50px;
+      color: var(--color-text-muted);
+    }
+
+    /* --- Buttons --- */
+
+    .cta-button {
+      background: linear-gradient(180deg, #2a1f18 0%, #1a120d 100%);
+      color: var(--color-gold);
+      border: 2px solid var(--color-gold-dim);
+      padding: 18px 45px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(184, 134, 67, 0.3);
+      pointer-events: none;
+    }
+
+    .cta-button:hover {
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 8px 30px rgba(184, 134, 67, 0.15);
+      text-shadow: 0 0 8px rgba(184, 134, 67, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .cta-button:active {
+      transform: translateY(1px);
+    }
+
+    /* --- Stages & Cards --- */
+
+    .stage {
+      display: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .stage.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .content-section {
+      text-align: center;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .question-card {
+      background: rgba(26, 18, 13, 0.9);
+      border: 1px solid var(--color-gold-dim);
+      padding: 60px;
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow:
+        inset 0 0 60px rgba(0, 0, 0, 0.8),
+        0 20px 50px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .question-card::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 2px solid rgba(184, 134, 67, 0.15);
+      outline: 1px solid rgba(184, 134, 67, 0.1);
+      outline-offset: -5px;
+      pointer-events: none;
+    }
+
+    .question-number {
+      font-family: 'Cinzel', serif;
+      font-size: 2.8rem;
+      letter-spacing: 0.2em;
+      color: var(--color-gold-dim);
+      margin-bottom: 25px;
+      display: block;
+    }
+
+    .question-number::before,
+    .question-number::after {
+      content: '—';
+      margin: 0 10px;
+      opacity: 0.5;
+    }
+
+    .question-text {
+      font-size: 2.5rem;
+      margin-bottom: 50px;
+      line-height: 1.4;
+      font-family: 'Playfair Display', serif;
+      color: var(--color-text-cream);
+    }
+
+    .answer-grid {
+      display: grid;
+      gap: 25px;
+    }
+
+    .answer-option {
+      background: linear-gradient(90deg, transparent 0%, rgba(184, 134, 67, 0.05) 50%, transparent 100%);
+      border: 1px solid transparent;
+      border-top: 1px solid rgba(184, 134, 67, 0.2);
+      border-bottom: 1px solid rgba(184, 134, 67, 0.2);
+      padding: 25px 30px;
+      color: var(--color-text-muted);
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.35rem;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      text-align: center;
+      position: relative;
+    }
+
+    .answer-option::before {
+      content: '❧';
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-gold);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .answer-option::after {
+      content: '❧';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%) scaleX(-1);
+      color: var(--color-gold);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .answer-option:hover {
+      background: rgba(184, 134, 67, 0.08);
+      color: var(--color-text-cream);
+      letter-spacing: 0.02em;
+      border-color: rgba(184, 134, 67, 0.5);
+    }
+
+    .answer-option:hover::before,
+    .answer-option:hover::after {
+      opacity: 1;
+    }
+
+    /* --- Camera Section --- */
+
+    .scan-section {
+      background:
+        linear-gradient(to bottom, rgba(20, 14, 10, 0.88), rgba(20, 14, 10, 0.92)),
+        url('Victorian-Photos_featured-1536x1047.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 4px double var(--color-gold-dim);
+      padding: 50px;
+      margin: 0 auto;
+      max-width: 900px;
+      position: relative;
+      backdrop-filter: blur(5px);
+    }
+
+    .camera-frame {
+      width: 100%;
+      max-width: 500px;
+      height: 400px;
+      margin: 30px auto;
+      background: #000;
+      border: 10px solid #2a1f18;
+      box-shadow:
+        0 0 0 2px var(--color-gold-dim),
+        inset 0 0 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .camera-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 30%, rgba(40, 25, 15, 0.6) 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    /* --- Victorian Scanning Effect --- */
+
+    .camera-frame::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(to bottom,
+          transparent,
+          rgba(184, 134, 67, 0.8),
+          rgba(212, 166, 84, 1),
+          rgba(184, 134, 67, 0.8),
+          transparent);
+      box-shadow:
+        0 0 20px rgba(212, 166, 84, 0.8),
+        0 0 40px rgba(184, 134, 67, 0.6);
+      z-index: 10;
+      animation: scanLine 3s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scanLine {
+      0% {
+        top: 0;
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        top: 100%;
+        opacity: 0;
+      }
+    }
+
+    /* Scanning grid overlay */
+    .camera-frame .scan-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg,
+          transparent,
+          transparent 19px,
+          rgba(184, 134, 67, 0.1) 19px,
+          rgba(184, 134, 67, 0.1) 20px),
+        repeating-linear-gradient(90deg,
+          transparent,
+          transparent 19px,
+          rgba(184, 134, 67, 0.1) 19px,
+          rgba(184, 134, 67, 0.1) 20px);
+      z-index: 6;
+      pointer-events: none;
+      opacity: 0;
+      animation: gridPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes gridPulse {
+
+      0%,
+      100% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    /* Corner scanning markers */
+    .camera-frame .scan-corner {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(212, 166, 84, 0.8);
+      z-index: 7;
+      pointer-events: none;
+      animation: cornerPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes cornerPulse {
+
+      0%,
+      100% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+    }
+
+    .camera-frame .scan-corner.tl {
+      top: 10px;
+      left: 10px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .camera-frame .scan-corner.tr {
+      top: 10px;
+      right: 10px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .camera-frame .scan-corner.bl {
+      bottom: 10px;
+      left: 10px;
+      border-right: none;
+      border-top: none;
+    }
+
+    .camera-frame .scan-corner.br {
+      bottom: 10px;
+      right: 10px;
+      border-left: none;
+      border-top: none;
+    }
+
+    /* --- NEW Results Page Design --- */
+
+    /* Breathing background portrait */
+    .result-background-portrait {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      filter: sepia(0.4) contrast(1.2) brightness(0.7);
+      z-index: -1;
+      animation: breatheBackground 8s ease-in-out infinite;
+    }
+
+    @keyframes breatheBackground {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.15;
+      }
+
+      50% {
+        transform: scale(1.05);
+        opacity: 0.22;
+      }
+    }
+
+    .result-section-new {
+      min-height: 100vh;
+      padding: 60px 40px;
+      position: relative;
+    }
+
+    .result-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 450px 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    /* Left: Large Portrait - vertically centered with content */
+
+    .portrait-frame-large {
+      position: relative;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(42, 31, 24, 0.9), rgba(21, 15, 10, 0.95));
+      border: 3px solid var(--color-gold-dim);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      animation: portraitPulse 6s ease-in-out infinite;
+    }
+
+    @keyframes portraitPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(184, 134, 67, 0.2);
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 50px rgba(184, 134, 67, 0.4);
+        transform: scale(1.02);
+      }
+    }
+
+    .result-portrait-img {
+      width: 100%;
+      height: 550px;
+      background-color: #1a120d;
+      overflow: hidden;
+      position: relative;
+      filter: sepia(0.5) contrast(1.15);
+    }
+
+    .result-portrait-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: imageBreathe 7s ease-in-out infinite;
+    }
+
+    @keyframes imageBreathe {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.03);
+      }
+    }
+
+    /* Right: Content Area */
+    .result-content-area {
+      padding-top: 40px;
+    }
+
+    /* Your spirit aligns with - BIGGER */
+    .spirit-aligns-text {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 3.2rem;
+      color: var(--color-gold-dim);
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      animation: gentleGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes gentleGlow {
+
+      0%,
+      100% {
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      }
+
+      50% {
+        text-shadow: 0 2px 12px rgba(184, 134, 67, 0.5), 0 0 20px rgba(184, 134, 67, 0.3);
+      }
+    }
+
+    /* Name - CENTERED and LARGE */
+    .result-name-large {
+      font-family: 'Cinzel', serif;
+      font-size: 5rem;
+      color: var(--color-gold-bright);
+      text-align: center;
+      margin: 0 0 30px 0;
+      line-height: 1.1;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      letter-spacing: 0.05em;
+    }
+
+    .result-divider {
+      margin: 30px auto 50px;
+      width: 150px;
+    }
+
+    /* Right side content */
+    .result-info-right {
+      max-width: 700px;
+    }
+
+    .result-subtitle-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: var(--color-text-cream);
+      font-style: italic;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .result-description-new {
+      font-size: 1.25rem;
+      line-height: 1.9;
+      color: var(--color-text-muted);
+      margin-bottom: 50px;
+      padding-left: 30px;
+      border-left: 3px double var(--color-gold-dim);
+      text-align: justify;
+    }
+
+    .traits-heading {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      color: var(--color-gold-dim);
+      margin-bottom: 25px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Begin Anew - centered */
+    .result-action-center {
+      text-align: center;
+      margin-top: 80px;
+      padding-top: 60px;
+      border-top: 2px solid rgba(184, 134, 67, 0.3);
+    }
+
+    .btn-begin-anew {
+      font-size: 1.5rem;
+      padding: 22px 60px;
+      letter-spacing: 0.25em;
+    }
+
+    /* --- Victorian QR Code Container --- */
+    .qr-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 50;
+      background: linear-gradient(135deg, rgba(26, 18, 13, 0.98), rgba(20, 15, 10, 0.98));
+      border: 3px solid var(--color-gold-dim);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(184, 134, 67, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+    }
+
+    .qr-container.visible {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    .qr-container::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(184, 134, 67, 0.3);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .qr-container:hover {
+      border-color: var(--color-gold-bright);
+      box-shadow:
+        0 15px 50px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(184, 134, 67, 0.5),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .qr-header {
+      text-align: center;
+      margin-bottom: 15px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      color: var(--color-gold);
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .qr-code-wrapper {
+      background: white;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #qrCodeCanvas {
+      display: block;
+      width: 240px;
+      height: 240px;
+    }
+
+    .qr-caption {
+      text-align: center;
+      margin-top: 12px;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .result-container {
+        grid-template-columns: 1fr;
+        gap: 60px;
+      }
+
+      .result-portrait-large {
+        position: relative;
+        top: 0;
+        max-width: 450px;
+        margin: 0 auto;
+      }
+
+      .result-name-large {
+        font-size: 3.5rem;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .result-container {
+        grid-template-columns: 1fr;
+        gap: 50px;
+      }
+
+      .portrait-frame-large {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .result-content-area {
+        padding-top: 0;
+      }
+
+      .result-info-right {
+        max-width: 100%;
+      }
+
+      .qr-container {
+        bottom: 20px;
+        right: 20px;
+        padding: 15px;
+      }
+
+      #qrCodeCanvas {
+        width: 200px;
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .result-name-large {
+        font-size: 2.5rem;
+      }
+
+      .spirit-aligns-text {
+        font-size: 2.2rem;
+      }
+
+      .result-subtitle-text {
+        font-size: 1.7rem;
+      }
+
+      .result-section-new {
+        padding: 40px 20px;
+      }
+
+      .result-description-new {
+        padding-left: 20px;
+        text-align: left;
+      }
+
+      .result-action-center {
+        margin-top: 60px;
+        padding-top: 40px;
+      }
+
+      .qr-container {
+        bottom: 15px;
+        right: 15px;
+        padding: 12px;
+      }
+
+      #qrCodeCanvas {
+        width: 160px;
+        height: 160px;
+      }
+
+      .qr-header {
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Keep old portrait styles for compatibility */
+    .result-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .result-details {
+      flex: 1;
+      text-align: left;
+    }
+
+    .result-description {
+      font-size: 1.35rem;
+      margin-bottom: 40px;
+      position: relative;
+      padding-left: 25px;
+      border-left: 3px double var(--color-gold-dim);
+    }
+
+    .traits-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 600px;
+    }
+
+    .trait-badge {
+      border: 2px solid var(--color-gold-dim);
+      padding: 18px 30px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.12em;
+      color: var(--color-gold);
+      position: relative;
+      background: rgba(184, 134, 67, 0.08);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .trait-badge::before,
+    .trait-badge::after {
+      content: '•';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--color-gold-dim);
+    }
+
+    .trait-badge::before {
+      left: 6px;
+    }
+
+    .trait-badge::after {
+      right: 6px;
+    }
+
+    .trait-badge:hover {
+      background: rgba(184, 134, 67, 0.15);
+      border-color: var(--color-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(184, 134, 67, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .traits-grid {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+      }
+    }
+
+    /* --- Transition Overlay --- */
+
+    .transition-screen {
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(15, 8, 5, 0.85), rgba(15, 8, 5, 0.9)),
+        url('backgronda.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .transition-screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .transition-content {
+      text-align: center;
+    }
+
+    .loading-ornament {
+      font-size: 120px;
+      color: var(--color-gold);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.15);
+      }
+    }
+
+    /* --- Victorian Audio Control Button --- */
+
+    .audio-control-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 200;
+      background: linear-gradient(135deg, rgba(26, 18, 13, 0.95), rgba(20, 15, 10, 0.98));
+      border: 2px solid rgba(184, 134, 67, 0.5);
+      padding: 15px 25px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.6),
+        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+    }
+
+    .audio-control-btn::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(184, 134, 67, 0.2);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    .audio-control-btn:hover {
+      border-color: rgba(212, 166, 84, 0.8);
+      transform: translateY(-3px);
+      box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(184, 134, 67, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    }
+
+    .audio-control-btn.playing {
+      border-color: rgba(184, 134, 67, 0.7);
+    }
+
+    .audio-control-btn.playing .audio-icon {
+      animation: soundPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes soundPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .audio-icon {
+      font-size: 1.5rem;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .audio-status {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--color-gold);
+      text-transform: uppercase;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .audio-control-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+      }
+
+      .audio-status {
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #120c09;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3e2d20;
+      border: 1px solid #1a120d;
+    }
+  </style>
+  <style>
+    @view-transition {
+      navigation: auto;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+</head>
+
+<body>
+
+  <div class="background-stage" id="backgroundStage">
+    <div id="landingBackground">
+      <!-- Victorian Slideshow Images - 9 slides -->
+      <div class="slideshow-image active" style="background-image: url('vic1.1.jpg');"></div>
+      <div class="slideshow-image" style="background-image: url('vic1.2.jpg');"></div>
+      <div class="slideshow-image" style="background-image: url('vic1.jpg');"></div>
+      <div class="slideshow-image" style="background-image: url('vic2.jpg');"></div>
+      <div class="slideshow-image" style="background-image: url('vic3.avif');"></div>
+      <div class="slideshow-image" style="background-image: url('vic4.jpg');"></div>
+      <div class="slideshow-image" style="background-image: url('vic5.webp');"></div>
+      <div class="slideshow-image" style="background-image: url('vic7.jpg');"></div>
+      <div class="slideshow-image" style="background-image: url('VICTORIAN ERA DOCUMENT.jpg');"></div>
+    </div>
+
+    <div class="scene-layer active"
+      style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e0/Caspar_David_Friedrich_-_Wanderer_above_the_Sea_of_Fog_-_Google_Art_Project.jpg');">
+    </div>
+    <div class="scene-layer"
+      style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/99/Menzel_das_balkonzimmer.jpg');">
+    </div>
+
+    <div class="overlay-grain"></div>
+    <div class="particles-container" id="particles">
+    </div>
+    <div class="overlay-vignette"></div>
+  </div>
+
+  <!-- Victorian Slideshow Controller Script -->
+  <script>
+    (function () {
+      const slides = document.querySelectorAll('#landingBackground .slideshow-image');
+      if (slides.length === 0) return;
+
+      let currentSlide = 0;
+
+      function nextSlide() {
+        // Add fading-out class to current slide for smooth transition
+        slides[currentSlide].classList.add('fading-out');
+        slides[currentSlide].classList.remove('active');
+
+        // Move to next slide
+        currentSlide = (currentSlide + 1) % slides.length;
+
+        // Activate next slide (it will fade in smoothly)
+        slides[currentSlide].classList.add('active');
+
+        // Clean up fading-out class after transition completes (12 seconds)
+        setTimeout(() => {
+          slides.forEach(slide => slide.classList.remove('fading-out'));
+        }, 12000);
+      }
+
+      // Change slide every 4 seconds for slower, more gradual morphing
+      setInterval(nextSlide, 4000);
+    })();
+  </script>
+
+  <div id="transitionScreen" class="transition-screen">
+    <div class="transition-content">
+      <div class="loading-ornament">⚜</div>
+      <p class="script-text" id="transitionMessage" style="margin-top: 30px; font-size: 3.5rem;">Loading...</p>
+    </div>
+
+    <!-- Victorian Ambient Sound - Edward Elgar -->
+    <audio id="victorianAmbience" loop preload="auto">
+      <source src="Chanson de Matin by Sir Edward Elgar - Victorian Paintings [9s50XAbh7ro].mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Audio Control Button -->
+    <button id="audioControl" class="audio-control-btn" aria-label="Toggle music">
+      <span class="audio-icon">🎵</span>
+      <span class="audio-status">Sound On</span>
+    </button>
+
+    <script>
+      // Victorian Ambient Audio Controller
+      (function () {
+        const audio = document.getElementById('victorianAmbience');
+        const audioBtn = document.getElementById('audioControl');
+        const audioIcon = audioBtn.querySelector('.audio-icon');
+        const audioStatus = audioBtn.querySelector('.audio-status');
+        let isPlaying = false;
+
+        // Set initial volume (subtle background music)
+        audio.volume = 0.25;
+
+        // Function to start audio with fade-in effect
+        function startAudio() {
+          audio.volume = 0;
+          audio.play().then(() => {
+            isPlaying = true;
+            audioIcon.textContent = '🎵';
+            audioStatus.textContent = 'Sound On';
+            audioBtn.classList.add('playing');
+
+            // Fade in over 2 seconds
+            let vol = 0;
+            const fadeIn = setInterval(() => {
+              if (vol < 0.25) {
+                vol += 0.01;
+                audio.volume = Math.min(vol, 0.25);
+              } else {
+                clearInterval(fadeIn);
+              }
+            }, 80);
+          }).catch(err => {
+            console.log('Autoplay prevented. Click button to enable sound.');
+          });
+        }
+
+        // Toggle audio
+        audioBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (isPlaying) {
+            audio.pause();
+            isPlaying = false;
+            audioIcon.textContent = '🔇';
+            audioStatus.textContent = 'Sound Off';
+            audioBtn.classList.remove('playing');
+          } else {
+            startAudio();
+          }
+        });
+
+        // Try to start on first page interaction
+        let hasInteracted = false;
+        document.body.addEventListener('click', function initAudio() {
+          if (!isPlaying && !hasInteracted) {
+            hasInteracted = true;
+            startAudio();
+          }
+        }, { once: true });
+
+      })();
+    </script>
+  </div>
+
+  <div class="app-container">
+    <div class="content-wrapper">
+
+      <div id="welcomeStage" class="stage active">
+        <div class="hero-header">
+          <div class="corner-flourish top-left"></div>
+          <div class="corner-flourish top-right"></div>
+          <div class="corner-flourish bottom-left"></div>
+          <div class="corner-flourish bottom-right"></div>
+
+          <h1 class="hero-title" id="exhibitTitle">Which Victorian Soul Lives Within You?</h1>
+          <div class="hero-divider"></div>
+          <p class="script-text" style="margin-bottom: 25px; color: var(--color-gold); font-size: 2.5rem;">Discover Your
+            True Nature</p>
+          <p class="hero-description" id="welcomeText">Step into the gaslit parlor of the Victorian Era. Through
+            introspection and careful observation, we shall divine which literary figure or soulful archetype mirrors
+            your own...</p>
+
+          <button class="cta-button" onclick="startExperience()">
+            <span id="beginButtonText">Begin Your Journey</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="scanStage" class="stage">
+        <div class="content-section">
+          <div class="ornate-border" style="display: inline-block; padding: 40px;">
+            <h2 style="margin-bottom: 10px; font-size: 2.5rem;">The Physiognomy Analysis</h2>
+            <p class="script-text" style="margin-bottom: 30px; font-size: 2.2rem;">"The face is the mirror of the soul"
+            </p>
+
+            <div class="scan-section">
+              <div class="corner-flourish top-left"></div>
+              <div class="corner-flourish top-right"></div>
+              <div class="corner-flourish bottom-left"></div>
+              <div class="corner-flourish bottom-right"></div>
+
+              <p id="scanInstruction"
+                style="font-style: italic; color: var(--color-text-muted); margin-bottom: 20px; font-size: 1.6rem;">
+                Allow our apparatus to glimpse your countenance...
+              </p>
+
+              <div class="camera-frame">
+                <video id="cameraVideo" autoplay playsinline muted
+                  style="width:100%; height:100%; object-fit:cover; opacity: 0.8;"></video>
+                <!-- Scanning grid overlay -->
+                <div class="scan-grid"></div>
+                <!-- Corner scanning markers -->
+                <div class="scan-corner tl"></div>
+                <div class="scan-corner tr"></div>
+                <div class="scan-corner bl"></div>
+                <div class="scan-corner br"></div>
+                <div style="position:absolute; inset:0; border:1px solid rgba(255,255,255,0.1); pointer-events:none;">
+                </div>
+              </div>
+
+              <div class="scan-status">
+                <p id="scanMessage" style="font-family: 'Cinzel', serif; color: var(--color-gold); font-size: 1.8rem;">
+                  Initializing Apparatus...</p>
+                <div id="loadingIndicator" class="loading-ornament" style="font-size: 30px; margin-top: 15px;">❈</div>
+              </div>
+
+              <button id="proceedButton" class="cta-button" style="display: none; margin-top: 30px;"
+                onclick="startQuiz()">
+                Proceed to Inquiry
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="quizStage" class="stage">
+        <div class="content-section">
+          <div id="questionContainer"></div>
+        </div>
+      </div>
+
+      <div id="resultStage" class="stage">
+        <!-- Portrait as animated background -->
+        <div class="result-background-portrait" id="resultBackgroundPortrait"></div>
+
+        <div class="result-section-new">
+          <div class="result-container">
+            <!-- Left: Large Portrait -->
+            <div class="result-portrait-large">
+              <div class="portrait-frame-large">
+                <div class="corner-flourish top-left"></div>
+                <div class="corner-flourish top-right"></div>
+                <div class="corner-flourish bottom-left"></div>
+                <div class="corner-flourish bottom-right"></div>
+                <div class="result-portrait-img" id="resultPortrait"></div>
+              </div>
+            </div>
+
+            <!-- Center/Right: Content -->
+            <div class="result-content-area">
+              <!-- Your spirit aligns with - bigger font -->
+              <p class="spirit-aligns-text">Your spirit aligns with</p>
+
+              <!-- Name - centered and prominent -->
+              <h2 class="result-name-large" id="resultName">Character Name</h2>
+
+              <div class="hero-divider result-divider"></div>
+
+              <!-- Right side: Subtitle, Description, and Traits -->
+              <div class="result-info-right">
+                <h3 class="result-subtitle-text" id="resultSubtitle">The Archetype</h3>
+
+                <div class="result-description-new" id="resultDescription">
+                  Character description will appear here...
+                </div>
+
+                <h4 class="traits-heading">Distinguishing Traits</h4>
+                <div class="traits-grid" id="traitsGrid"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Begin Anew - Centered at bottom -->
+          <div class="result-action-center">
+            <button class="cta-button btn-begin-anew" onclick="restartExperience()">Begin Anew</button>
+          </div>
+
+          <!-- QR Code Container -->
+          <div id="qrContainer" class="qr-container">
+            <div class="qr-header">Your Personal Result</div>
+            <div class="qr-code-wrapper">
+              <canvas id="qrCodeCanvas"></canvas>
+            </div>
+            <p class="qr-caption">Scan to view your personalized result page</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /**
+     * VICTORIAN PERSONALITY QUIZ - BACKEND-INTEGRATED QR CODE SYSTEM
+     * 
+     * This application generates unique QR codes that link to backend-hosted result pages.
+     * 
+     * Features:
+     * - Captures facial snapshot during physiognomy scan
+     * - Sends complete result data to backend API
+     * - Backend generates unique result ID and URL
+     * - Creates QR code pointing to actual result page
+     * - QR positioned in lower-right corner with Victorian styling
+     * - Users can revisit, save, or share their results
+     * 
+     * Backend Integration:
+     * - POST /api/results - Saves quiz data, returns unique URL
+     * - GET /results/{id} - Displays personalized result page
+     * - Database stores all participant data securely
+     * - Each result has permanent, unique identifier
+     * 
+     * Fallback Mode (without backend):
+     * - Stores results in localStorage
+     * - Generates mock result URLs
+     * - QR code still functions locally
+     * - Console shows warning about offline mode
+     * 
+     * See BACKEND_INTEGRATION_GUIDE.md for full implementation details
+     */
+
+    const defaultConfig = {
+      exhibit_title: "Victorian Personality Quiz",
+      welcome_text: "Step into the Victorian Era and discover which literary figure or character mirrors your soul. Through introspection and careful observation, we shall divine the essence of your character...",
+      scan_instruction: "Allow us to glimpse your countenance through which your character quietly speaks. Stand before us, and let modern science reveal your inner nature...",
+      begin_button_text: "Begin Your Journey"
+    };
+
+    let currentQuestionIndex = 0;
+    let answers = [];
+    let scanMood = "";
+    let currentRecordCount = 0;
+    let physiognomySnapshot = null; // Store the captured facial snapshot
+    let uniqueResultId = null; // Unique ID for each result (from backend)
+    let resultPageUrl = null; // Backend-generated result page URL
+
+    /* --- Background System Setup --- */
+    function initAtmosphere() {
+      // Create particles
+      const container = document.getElementById('particles');
+      const particleCount = 25;
+
+      for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 4 + 2;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.animationDuration = `${Math.random() * 20 + 20}s`;
+        p.style.animationDelay = `${Math.random() * -20}s`;
+        p.style.opacity = Math.random() * 0.4;
+        container.appendChild(p);
+      }
+
+      // Scene Cycling (Simple slow crossfade) for quiz/scan stages
+      const scenes = document.querySelectorAll('.scene-layer');
+      let currentScene = 0;
+
+      if (scenes.length > 1) {
+        setInterval(() => {
+          scenes[currentScene].classList.remove('active');
+          currentScene = (currentScene + 1) % scenes.length;
+          scenes[currentScene].classList.add('active');
+        }, 15000); // Change scene every 15 seconds
+      }
+    }
+
+    const questions = [
+      {
+        question: "When entering a crowded ballroom, where do your eyes linger?",
+        answers: [
+          { text: "On the sidelines, observing the hidden dramas between guests", traits: ["observant", "analytical"] },
+          { text: "On the lively groups, eager to join the wit and laughter", traits: ["sociable", "witty"] },
+          { text: "On the exits, wishing to retreat to the quiet of nature", traits: ["isolated", "melancholic"] },
+          { text: "On the lavish decorations, critiquing the aesthetic choices", traits: ["aesthetic", "artistic"] }
+        ]
+      },
+      {
+        question: "A close friend has committed a scandalous but victimless social error. You:",
+        answers: [
+          { text: "Defend them publicly; loyalty matters more than reputation", traits: ["rebellious", "independent"] },
+          { text: "Advise them privately to make amends and restore order", traits: ["principled", "dutiful"] },
+          { text: "Find the humor in the absurdity of the situation", traits: ["witty", "nuanced"] },
+          { text: "Analyze why society deems it an error in the first place", traits: ["intellectual", "progressive"] }
+        ]
+      },
+      {
+        question: "What is your preferred relationship with the natural world?",
+        answers: [
+          { text: "It is a mirror of my own turbulent soul", traits: ["passionate", "intense"] },
+          { text: "It is a system to be understood and categorized", traits: ["rational", "analytical"] },
+          { text: "It is a place of peace, away from the corruption of the city", traits: ["romantic", "introverted"] },
+          { text: "It is a source of raw beauty to be captured in art", traits: ["aesthetic", "expressive"] }
+        ]
+      },
+      {
+        question: "Which vice do you find most forgivable?",
+        answers: [
+          { text: "Passion that overrides reason", traits: ["passionate", "romantic"] },
+          { text: "Pride born of capability and intelligence", traits: ["rational", "independent"] },
+          { text: "A sharp tongue used to expose the dull", traits: ["witty", "cynical"] },
+          { text: "Rebellion against unjust laws", traits: ["rebellious", "progressive"] }
+        ]
+      },
+      {
+        question: "The Industrial Revolution is sweeping the nation. Your thought?",
+        answers: [
+          { text: "We must ensure the poor are not ground to dust by it", traits: ["humanistic", "empathetic"] },
+          { text: "It is an ugly stain on the landscape", traits: ["aesthetic", "romantic"] },
+          { text: "It is a fascinating triumph of human logic and engineering", traits: ["rational", "progressive"] },
+          { text: "It matters little compared to the eternal storms of the heart", traits: ["isolated", "intense"] }
+        ]
+      },
+      {
+        question: "In a partner, what quality is non-negotiable?",
+        answers: [
+          { text: "An intellectual equal who can challenge me", traits: ["intellectual", "independent"] },
+          { text: "A soul capable of consuming, absolute devotion", traits: ["intense", "passionate"] },
+          { text: "Someone with kindness and a gentle moral compass", traits: ["empathetic", "principled"] },
+          { text: "A companion with wit to laugh at the world", traits: ["witty", "sociable"] }
+        ]
+      },
+      {
+        question: "How do you handle deep sorrow?",
+        answers: [
+          { text: "I retreat into solitude to weather the storm alone", traits: ["isolated", "introverted"] },
+          { text: "I channel it into work, art, or creating something beautiful", traits: ["expressive", "artistic"] },
+          { text: "I analyze the feeling to understand its origin", traits: ["analytical", "rational"] },
+          { text: "I seek the comfort of others and share the burden", traits: ["sociable", "humanistic"] }
+        ]
+      },
+      {
+        question: "What defines a life well-lived?",
+        answers: [
+          { text: "Adherence to one's principles despite temptation", traits: ["principled", "dutiful"] },
+          { text: "The pursuit of beauty and sensation", traits: ["aesthetic", "witty"] },
+          { text: "Understanding the truths of the universe", traits: ["intellectual", "analytical"] },
+          { text: "Fighting to improve the lot of the common man", traits: ["humanistic", "progressive"] }
+        ]
+      },
+      {
+        question: "Someone insults your honor. Your immediate instinct?",
+        answers: [
+          { text: "To destroy them utterly, whatever the cost", traits: ["intense", "melancholic"] },
+          { text: "To deliver a cutting remark that exposes their foolishness", traits: ["witty", "observant"] },
+          { text: "To prove them wrong through superior conduct", traits: ["principled", "rational"] },
+          { text: "To pity their ignorance and move on", traits: ["empathetic", "nuanced"] }
+        ]
+      },
+      {
+        question: "If you were to write a book, what would it be?",
+        answers: [
+          { text: "A gothic romance full of ghosts and gales", traits: ["romantic", "intense"] },
+          { text: "A stinging satire of high society", traits: ["witty", "observant"] },
+          { text: "A detailed study of a complex moral dilemma", traits: ["nuanced", "intellectual"] },
+          { text: "A treatise on the rights of the unheard", traits: ["progressive", "passionate"] }
+        ]
+      }
+    ];
+
+    const victorianPersonalities = {
+      "Jane Eyre": {
+        portrait: "Jane Eyre.jpg",
+        subtitle: "The Independent Spirit",
+        description: "Like Charlotte Brontë's indomitable heroine, you possess a fierce independence and unwavering moral compass. You value integrity above comfort and refuse to compromise your principles for social approval. Though circumstances may constrain you, your spirit remains unbreakable.",
+        traits: ["Independent", "Principled", "Resilient", "Introspective"],
+        matchTraits: ["principled", "independent", "dutiful", "introverted", "passionate"]
+      },
+      "Oscar Wilde": {
+        portrait: "Oscar Wilde.jpg",
+        subtitle: "The Aesthetic Wit",
+        description: "Your character mirrors the brilliant Oscar Wilde - valuing beauty, wit, and the art of living itself. You see through social pretensions with sharp observation, yet engage with life's pleasures fully. Art and aesthetic experience hold more truth for you than rigid morality.",
+        traits: ["Witty", "Aesthetic", "Observant", "Unconventional"],
+        matchTraits: ["aesthetic", "witty", "artistic", "expressive", "rebellious"]
+      },
+      "Emily Brontë": {
+        portrait: "Brontë.webp",
+        subtitle: "The Passionate Romantic",
+        description: "Like the creator of Heathcliff and Catherine, your soul harbors depths of passion and connection to wild, untamed nature. You feel emotions with overwhelming intensity and resist the constraints of conventional society. Your inner world is vast and often tempestuous.",
+        traits: ["Passionate", "Intense", "Nature-Loving", "Unconventional"],
+        matchTraits: ["romantic", "passionate", "introverted", "intense", "isolated"]
+      },
+      "Charles Dickens": {
+        portrait: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Dickens_Gurney_head.jpg/220px-Dickens_Gurney_head.jpg",
+        subtitle: "The Social Conscience",
+        description: "Your character aligns with Dickens' great humanitarian spirit. You possess deep empathy for those suffering under social injustice and believe in speaking for the voiceless. Your warmth and compassion are matched by your commitment to exposing society's wrongs.",
+        traits: ["Compassionate", "Reformist", "Observant", "Humanistic"],
+        matchTraits: ["humanistic", "empathetic", "progressive", "sociable", "expressive"]
+      },
+      "Sherlock Holmes": {
+        portrait: "Sherlock.webp",
+        subtitle: "The Rational Mind",
+        description: "Like Arthur Conan Doyle's legendary detective, you approach life with keen observation and rational analysis. You value logic over emotion, see patterns others miss, and prefer solitary contemplation to social frivolity. The puzzle of existence fascinates you.",
+        traits: ["Analytical", "Observant", "Solitary", "Rational"],
+        matchTraits: ["rational", "analytical", "observant", "intellectual", "introverted"]
+      },
+      "Elizabeth Bennet": {
+        portrait: "Elizabeth.jpeg",
+        subtitle: "The Spirited Wit",
+        description: "Your personality echoes Jane Austen's beloved heroine - possessed of intelligence, wit, and a refusal to be constrained by social expectations. You navigate society's demands while maintaining your integrity and independence of thought. Your spirit cannot be diminished.",
+        traits: ["Witty", "Independent", "Balanced", "Perceptive"],
+        matchTraits: ["witty", "independent", "sociable", "observant", "nuanced"]
+      },
+      "Heathcliff": {
+        portrait: "Heathcliff.jpg",
+        subtitle: "The Tortured Soul",
+        description: "Like Brontë's most complex creation, you carry within you great capacity for both devotion and darkness. Circumstances have shaped you into someone who feels deeply, often painfully. Your intensity sets you apart, for better or worse.",
+        traits: ["Intense", "Complex", "Passionate", "Isolated"],
+        matchTraits: ["intense", "melancholic", "isolated", "passionate", "introverted"]
+      },
+      "George Eliot": {
+        portrait: "George Eliot.webp",
+        subtitle: "The Philosophical Observer",
+        description: "Like Mary Ann Evans who wrote as George Eliot, you possess remarkable intellectual depth and psychological insight. You understand human complexity and moral ambiguity. Your compassion is informed by wisdom, and you seek truth above social comfort.",
+        traits: ["Intellectual", "Empathetic", "Nuanced", "Progressive"],
+        matchTraits: ["intellectual", "nuanced", "empathetic", "progressive", "analytical"]
+      }
+    };
+
+    const dataHandler = {
+      onDataChanged(data) {
+        currentRecordCount = data.length;
+      }
+    };
+
+    async function initializeApp() {
+      const initResult = await window.dataSdk.init(dataHandler);
+      if (!initResult.isOk) {
+        console.error("Failed to initialize data SDK");
+      }
+      initAtmosphere();
+    }
+
+    function showTransition(message, callback, delay = 1800) {
+      const screen = document.getElementById('transitionScreen');
+      const messageEl = document.getElementById('transitionMessage');
+
+      messageEl.textContent = message;
+      screen.classList.add('active');
+
+      setTimeout(() => {
+        screen.classList.remove('active');
+        if (callback) {
+          setTimeout(callback, 300);
+        }
+      }, delay);
+    }
+
+    function showStage(stageId) {
+      document.querySelectorAll('.stage').forEach(stage => {
+        stage.classList.remove('active');
+        stage.style.opacity = '0';
+      });
+
+      const nextStage = document.getElementById(stageId);
+      nextStage.classList.add('active');
+
+      // Slight delay for fade in
+      setTimeout(() => {
+        nextStage.style.opacity = '1';
+      }, 50);
+
+      document.querySelector('.app-container').scrollTop = 0;
+    }
+
+    function startExperience() {
+      // Hide the special landing background when leaving the welcome stage
+      document.getElementById('landingBackground').classList.add('hidden');
+
+      showTransition('Entering the Parlor...', () => {
+        showStage('scanStage');
+        setTimeout(() => {
+          initializeCamera();
+        }, 800);
+      });
+    }
+
+    async function initializeCamera() {
+      const video = document.getElementById('cameraVideo');
+      const scanMessage = document.getElementById('scanMessage');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const proceedBtn = document.getElementById('proceedButton');
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        scanMessage.textContent = "Optical mechanism unavailable.";
+        loadingIndicator.style.display = 'none';
+        setTimeout(() => {
+          proceedBtn.style.display = 'inline-block';
+          proceedBtn.textContent = 'Proceed Without Optical Scan';
+        }, 1500);
+        return;
+      }
+
+      try {
+        scanMessage.textContent = "Adjusting lenses...";
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
+
+        scanMessage.textContent = "Lens aperture open...";
+
+        video.srcObject = stream;
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+
+        await new Promise((resolve) => {
+          video.onloadedmetadata = () => {
+            resolve();
+          };
+        });
+
+        try {
+          await video.play();
+          scanMessage.textContent = "Subject acquired. Observing...";
+        } catch (playError) {
+          console.log("Auto-play prevented, but video is ready");
+          scanMessage.textContent = "Subject acquired. Observing...";
+        }
+
+        setTimeout(() => {
+          simulateScan();
+        }, 2000);
+
+      } catch (error) {
+        console.error("Camera error:", error);
+        let errorMessage = "Mechanism malfunction.";
+
+        scanMessage.textContent = errorMessage;
+        loadingIndicator.style.display = 'none';
+
+        setTimeout(() => {
+          proceedBtn.style.display = 'inline-block';
+          proceedBtn.textContent = 'Proceed Manually';
+        }, 2000);
+      }
+    }
+
+    function simulateScan() {
+      const messages = [
+        "Noting cranial proportions...",
+        "Measuring brow furrow...",
+        "Detecting humours...",
+        "Consulting physiognomy charts...",
+        "Capturing countenance...",
+        "Deduction complete"
+      ];
+
+      const moods = ["Contemplative", "Spirited", "Earnest", "Reserved", "Melancholic"];
+
+      let messageIndex = 0;
+      const scanInterval = setInterval(() => {
+        if (messageIndex < messages.length) {
+          document.getElementById('scanMessage').textContent = messages[messageIndex];
+
+          // Capture snapshot when we reach "Capturing countenance..."
+          if (messageIndex === 4) {
+            capturePhysiognomySnapshot();
+          }
+
+          messageIndex++;
+        } else {
+          clearInterval(scanInterval);
+          scanMood = moods[Math.floor(Math.random() * moods.length)];
+          document.getElementById('scanMessage').textContent = `Subject Disposition: ${scanMood}`;
+          document.getElementById('loadingIndicator').style.display = 'none';
+          document.getElementById('proceedButton').style.display = 'inline-block';
+        }
+      }, 1500);
+    }
+
+    // Capture a snapshot from the video feed
+    function capturePhysiognomySnapshot() {
+      const video = document.getElementById('cameraVideo');
+      if (!video || !video.srcObject) {
+        console.log('No video stream available for snapshot');
+        return;
+      }
+
+      try {
+        // Create a canvas to capture the frame
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+
+        // Draw the current video frame
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert to data URL (base64 encoded image)
+        physiognomySnapshot = canvas.toDataURL('image/jpeg', 0.7);
+        console.log('Physiognomy snapshot captured successfully');
+      } catch (error) {
+        console.error('Error capturing snapshot:', error);
+      }
+    }
+
+    function stopCamera() {
+      const video = document.getElementById('cameraVideo');
+      if (video.srcObject) {
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+      }
+    }
+
+    function startQuiz() {
+      stopCamera();
+      currentQuestionIndex = 0;
+      answers = [];
+      showTransition('Preparing the Inquiry...', () => {
+        showStage('quizStage');
+        displayQuestion();
+      });
+    }
+
+    function displayQuestion() {
+      if (currentQuestionIndex >= questions.length) {
+        calculateResult();
+        return;
+      }
+
+      // --- Handle Full Screen Background for specific questions ---
+      const bgStage = document.getElementById('backgroundStage');
+      if (bgStage) {
+        let quizBg = document.getElementById('quizSpecificBackground');
+        if (!quizBg) {
+          quizBg = document.createElement('div');
+          quizBg.id = 'quizSpecificBackground';
+          quizBg.className = 'scene-layer';
+          quizBg.style.zIndex = '3'; // Higher than standard scenes (1)
+          quizBg.style.transition = 'opacity 1.5s ease-in-out';
+          bgStage.appendChild(quizBg);
+        }
+
+        // Specific backgrounds for each question
+        const queryBackgrounds = [
+          "vic 6.jpg",      // Query 1
+          "query 2.jpg",    // Query 2
+          "query 3.jpg",    // Query 3
+          "query 4.jpg",    // Query 4
+          "query 5",        // Query 5
+          "query 6.webp",   // Query 6
+          "query 7.jpg",    // Query 7
+          "query 8.jpg",    // Query 8
+          "query 9.jpg",    // Query 9
+          "query 10.jpg"    // Query 10
+        ];
+
+        let specificBg = queryBackgrounds[currentQuestionIndex];
+
+        if (specificBg) {
+          quizBg.style.backgroundImage = `url('${specificBg}')`;
+          quizBg.classList.add('active');
+          quizBg.style.opacity = '1';
+        } else {
+          // Other questions: Fade out special background
+          quizBg.classList.remove('active');
+          quizBg.style.opacity = '0';
+        }
+      }
+
+      const question = questions[currentQuestionIndex];
+      const container = document.getElementById('questionContainer');
+
+      // Add animation class to trigger fade in for new question
+      container.style.opacity = '0';
+
+      setTimeout(() => {
+        container.innerHTML = `
+          <div class="question-card">
+            <div class="corner-flourish top-left"></div>
+            <div class="corner-flourish top-right"></div>
+            <div class="corner-flourish bottom-left"></div>
+            <div class="corner-flourish bottom-right"></div>
+            
+            <span class="question-number">Query ${romanize(currentQuestionIndex + 1)}</span>
+            <h3 class="question-text">${question.question}</h3>
+            <div class="answer-grid">
+              ${question.answers.map((answer, index) => `
+                <button class="answer-option" onclick="selectAnswer(${index})">
+                  ${answer.text}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        container.style.transition = 'opacity 0.8s ease';
+        container.style.opacity = '1';
+      }, 800);
+    }
+
+    function romanize(num) {
+      const lookup = { X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+      let roman = '';
+      for (let i in lookup) {
+        while (num >= lookup[i]) {
+          roman += i;
+          num -= lookup[i];
+        }
+      }
+      return roman;
+    }
+
+    function selectAnswer(answerIndex) {
+      const question = questions[currentQuestionIndex];
+      answers.push(question.answers[answerIndex]);
+      currentQuestionIndex++;
+
+      // Brief pause before next question
+      setTimeout(() => {
+        displayQuestion();
+      }, 400);
+    }
+
+    function calculateResult() {
+      const traitCounts = {};
+
+      answers.forEach(answer => {
+        answer.traits.forEach(trait => {
+          traitCounts[trait] = (traitCounts[trait] || 0) + 1;
+        });
+      });
+
+      let bestMatches = [];
+      let highestScore = 0;
+
+      Object.entries(victorianPersonalities).forEach(([name, personality]) => {
+        let score = 0;
+        personality.matchTraits.forEach(trait => {
+          if (traitCounts[trait]) {
+            score += traitCounts[trait];
+          }
+        });
+
+        if (score > highestScore) {
+          highestScore = score;
+          bestMatches = [{ name, ...personality }];
+        } else if (score === highestScore) {
+          bestMatches.push({ name, ...personality });
+        }
+      });
+
+      const bestMatch = bestMatches.length > 0
+        ? bestMatches[Math.floor(Math.random() * bestMatches.length)]
+        : { name: "Jane Eyre", ...victorianPersonalities["Jane Eyre"] };
+
+      showTransition('Formulating Deduction...', () => {
+        displayResult(bestMatch);
+      }, 3000);
+    }
+
+    async function displayResult(result) {
+      showStage('resultStage');
+
+      // Ensure Query 10 background doesn't merge with result
+      const quizBg = document.getElementById('quizSpecificBackground');
+      if (quizBg) {
+        quizBg.classList.remove('active');
+        quizBg.style.opacity = '0';
+      }
+
+      const portraitElement = document.getElementById('resultPortrait');
+      portraitElement.innerHTML = `<img src="${result.portrait}" alt="${result.name}" onerror="this.src=''; this.alt='Portrait unavailable'; this.style.display='none';">`;
+
+      // Also set the breathing background portrait
+      const backgroundPortrait = document.getElementById('resultBackgroundPortrait');
+      if (backgroundPortrait && result.portrait) {
+        backgroundPortrait.style.backgroundImage = `url('${result.portrait}')`;
+      }
+
+      document.getElementById('resultName').textContent = result.name;
+      document.getElementById('resultSubtitle').textContent = result.subtitle;
+      document.getElementById('resultDescription').textContent = result.description;
+
+      const traitsGrid = document.getElementById('traitsGrid');
+      traitsGrid.innerHTML = result.traits.map(trait => `
+        <div class="trait-badge">${trait}</div>
+      `).join('');
+
+      // Save result to backend and generate QR code
+      await saveResultToBackend(result);
+    }
+
+    // Save result to backend and get unique URL
+    async function saveResultToBackend(result) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+
+      // Victorian color scheme
+      const goldColor = [184, 134, 67]; // #b88643
+      const darkBrown = [42, 31, 24]; // #2a1f18
+      const cream = [232, 220, 200]; // #e8dcc8
+
+      // Page dimensions
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const margin = 20;
+
+      // Victorian ornamental border
+      doc.setDrawColor(...goldColor);
+      doc.setLineWidth(1.5);
+      doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+      doc.setLineWidth(0.5);
+      doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
+
+      // Title
+      doc.setFont('times', 'bold');
+      doc.setFontSize(32);
+      doc.setTextColor(...goldColor);
+      doc.text('Victorian Personality Analysis', pageWidth / 2, 30, { align: 'center' });
+
+      // Decorative line
+      doc.setDrawColor(...goldColor);
+      doc.setLineWidth(0.5);
+      doc.line(margin + 20, 38, pageWidth - margin - 20, 38);
+
+      // Character Name
+      doc.setFontSize(24);
+      doc.setTextColor(...darkBrown);
+      doc.text(result.name, pageWidth / 2, 52, { align: 'center' });
+
+      // Subtitle
+      doc.setFont('times', 'italic');
+      doc.setFontSize(14);
+      doc.setTextColor(100, 85, 70);
+      doc.text(`"${result.subtitle}"`, pageWidth / 2, 62, { align: 'center' });
+
+      // Physiognomy Snapshot
+      let currentY = 75;
+      if (physiognomySnapshot) {
+        try {
+          doc.setFont('times', 'bold');
+          doc.setFontSize(12);
+          doc.setTextColor(...goldColor);
+          doc.text('Physiognomy Analysis', margin, currentY);
+          currentY += 6;
+
+          // Add the snapshot image
+          const imgWidth = 60;
+          const imgHeight = 45;
+          doc.addImage(physiognomySnapshot, 'JPEG', margin, currentY, imgWidth, imgHeight);
+
+          // Add caption
+          doc.setFont('times', 'italic');
+          doc.setFontSize(9);
+          doc.setTextColor(100);
+          doc.text(`Captured: ${new Date().toLocaleString()}`, margin, currentY + imgHeight + 4);
+          doc.text(`Disposition: ${scanMood}`, margin, currentY + imgHeight + 9);
+
+          currentY += imgHeight + 15;
+        } catch (error) {
+          console.error('Error adding snapshot to PDF:', error);
+          currentY += 5;
+        }
+      }
+
+      // Description section
+      doc.setFont('times', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...goldColor);
+      doc.text('Character Analysis', margin, currentY);
+      currentY += 8;
+
+      doc.setFont('times', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(...darkBrown);
+      const descLines = doc.splitTextToSize(result.description, pageWidth - 2 * margin);
+      doc.text(descLines, margin, currentY);
+      currentY += descLines.length * 5 + 8;
+
+      // Traits section
+      doc.setFont('times', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...goldColor);
+      doc.text('Distinguishing Traits', margin, currentY);
+      currentY += 8;
+
+      doc.setFont('times', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(...darkBrown);
+      result.traits.forEach((trait, index) => {
+        doc.text(`• ${trait}`, margin + 5, currentY);
+        currentY += 6;
+      });
+      currentY += 5;
+
+      // Quiz Answers section
+      if (currentY + 40 > pageHeight - margin) {
+        doc.addPage();
+        currentY = margin + 10;
+
+        // Repeat border on new page
+        doc.setDrawColor(...goldColor);
+        doc.setLineWidth(1.5);
+        doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+        doc.setLineWidth(0.5);
+        doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
+      }
+
+      doc.setFont('times', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...goldColor);
+      doc.text('Your Responses', margin, currentY);
+      currentY += 8;
+
+      doc.setFont('times', 'normal');
+      doc.setFontSize(9);
+      answers.forEach((answer, index) => {
+        const question = questions[index];
+
+        if (currentY + 20 > pageHeight - margin) {
+          doc.addPage();
+          currentY = margin + 10;
+
+          // Repeat border on new page
+          doc.setDrawColor(...goldColor);
+          doc.setLineWidth(1.5);
+          doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+          doc.setLineWidth(0.5);
+          doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
+        }
+
+        doc.setTextColor(...goldColor);
+        doc.setFont('times', 'bold');
+        doc.text(`Question ${index + 1}:`, margin, currentY);
+        currentY += 5;
+
+        doc.setTextColor(...darkBrown);
+        doc.setFont('times', 'italic');
+        const questionLines = doc.splitTextToSize(question.question, pageWidth - 2 * margin - 5);
+        doc.text(questionLines, margin + 5, currentY);
+        currentY += questionLines.length * 4 + 3;
+
+        doc.setFont('times', 'normal');
+        doc.text('Your answer:', margin + 5, currentY);
+        currentY += 4;
+        const answerLines = doc.splitTextToSize(answer.text, pageWidth - 2 * margin - 10);
+        doc.text(answerLines, margin + 10, currentY);
+        currentY += answerLines.length * 4 + 6;
+      });
+
+      // Footer with unique ID
+      doc.setFont('times', 'italic');
+      doc.setFontSize(8);
+      doc.setTextColor(100);
+      uniqueResultId = `VCT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      doc.text(`Result ID: ${uniqueResultId}`, pageWidth / 2, pageHeight - 12, { align: 'center' });
+      doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+
+      // Generate PDF blob and create URL
+      const pdfBlob = doc.output('blob');
+      resultPdfUrl = URL.createObjectURL(pdfBlob);
+      // The client-side PDF generation is removed.
+      // The PDF generation will now happen on the backend.
+
+      try {
+        // BACKEND API CALL: Save result and get unique URL
+        // This should be replaced with your actual backend endpoint
+        const apiEndpoint = '/api/results'; // Replace with your API endpoint
+
+        const resultData = {
+          character: result.name,
+          subtitle: result.subtitle,
+          description: result.description,
+          traits: result.traits,
+          scanMood: scanMood,
+          answers: answers.map((a, index) => ({
+            question: questions[index].question,
+            answer: a.text,
+            traits: a.traits
+          })),
+          physiognomySnapshot: physiognomySnapshot, // Full base64 image
+          timestamp: new Date().toISOString()
+        };
+
+        console.log('� Sending result to backend...');
+
+        // Make API call to backend
+        const response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(resultData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Backend error: ${response.status}`);
+        }
+
+        const backendResponse = await response.json();
+
+        // Backend should return: { resultId: 'unique-id', resultUrl: '/results/unique-id' }
+        uniqueResultId = backendResponse.resultId;
+        resultPageUrl = backendResponse.resultUrl;
+
+        console.log('✅ Result saved to backend!');
+        console.log('🆔 Result ID:', uniqueResultId);
+        console.log('🔗 Result URL:', resultPageUrl);
+
+        // Generate QR code with backend URL
+        generateQRCode(resultPageUrl);
+
+      } catch (error) {
+        console.error('❌ Error saving to backend:', error);
+
+        // FALLBACK: For development/testing without backend
+        // Generate a mock result URL
+        uniqueResultId = `VCT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        resultPageUrl = `${window.location.origin}/results/${uniqueResultId}`;
+
+        console.warn('⚠️ Using fallback URL (backend not available)');
+        console.log('🆔 Mock Result ID:', uniqueResultId);
+        console.log('🔗 Mock Result URL:', resultPageUrl);
+
+        // Store in localStorage as fallback
+        try {
+          localStorage.setItem(`vct_result_${uniqueResultId}`, JSON.stringify({
+            id: uniqueResultId,
+            character: result.name,
+            subtitle: result.subtitle,
+            description: result.description,
+            traits: result.traits,
+            scanMood: scanMood,
+            answers: answers,
+            snapshot: physiognomySnapshot,
+            timestamp: new Date().toISOString()
+          }));
+        } catch (e) {
+          console.error('localStorage error:', e);
+        }
+
+        // Generate QR code even if backend fails
+        generateQRCode(resultPageUrl);
+      }
+
+      // Also save to SDK if available
+      saveResult(result.name);
+    }
+
+    // Generate QR code pointing to backend result URL
+    function generateQRCode(url) {
+      const qrCanvas = document.getElementById('qrCodeCanvas');
+      const qrContainer = document.getElementById('qrContainer');
+
+      try {
+        // Generate QR code using QRious library
+        const qr = new QRious({
+          element: qrCanvas,
+          value: url,
+          size: 240,
+          foreground: '#2a1f18',
+          background: '#ffffff',
+          level: 'H'
+        });
+
+        console.log('✅ QR Code generated successfully!');
+        console.log('🔗 QR Code URL:', url);
+
+        // Show the QR container with animation
+        setTimeout(() => {
+          qrContainer.classList.add('visible');
+        }, 800);
+      } catch (error) {
+        console.error('❌ Error generating QR code:', error);
+      }
+    }
+
+    async function saveResult(character) {
+      if (currentRecordCount >= 999) {
+        return;
+      }
+
+      const result = await window.dataSdk.create({
+        id: Date.now().toString(),
+        visitor_name: "Anonymous Visitor",
+        scan_mood: scanMood,
+        answers: answers.map(a => a.text.substring(0, 50)).join("; "),
+        result_character: character,
+        timestamp: new Date().toISOString()
+      });
+
+      if (!result.isOk) {
+        console.error("Failed to save result");
+      }
+    }
+
+    function restartExperience() {
+      stopCamera();
+      currentQuestionIndex = 0;
+      answers = [];
+      scanMood = "";
+      physiognomySnapshot = null;
+      uniqueResultId = null;
+      resultPageUrl = null;
+
+      // Hide QR code
+      document.getElementById('qrContainer').classList.remove('visible');
+
+      // Show the special landing background again
+      document.getElementById('landingBackground').classList.remove('hidden');
+
+      showTransition('Reseting the Stage...', () => {
+        showStage('welcomeStage');
+      });
+    }
+
+    async function onConfigChange(config) {
+      const exhibitTitle = config.exhibit_title || defaultConfig.exhibit_title;
+      const welcomeText = config.welcome_text || defaultConfig.welcome_text;
+      const scanInstruction = config.scan_instruction || defaultConfig.scan_instruction;
+      const beginButtonText = config.begin_button_text || defaultConfig.begin_button_text;
+
+      document.getElementById('exhibitTitle').textContent = exhibitTitle;
+      document.getElementById('welcomeText').textContent = welcomeText;
+      document.getElementById('scanInstruction').textContent = scanInstruction;
+      document.getElementById('beginButtonText').textContent = beginButtonText;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["exhibit_title", config.exhibit_title || defaultConfig.exhibit_title],
+          ["welcome_text", config.welcome_text || defaultConfig.welcome_text],
+          ["scan_instruction", config.scan_instruction || defaultConfig.scan_instruction],
+          ["begin_button_text", config.begin_button_text || defaultConfig.begin_button_text]
+        ])
+      });
+    }
+
+    // Check if we're loading a shared result from QR code
+    function checkForSharedResult() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resultId = urlParams.get('result');
+
+      if (resultId) {
+        // Try to load the result from localStorage
+        try {
+          const storedData = localStorage.getItem(`vct_result_${resultId}`);
+          if (storedData) {
+            const resultData = JSON.parse(storedData);
+            displaySharedResult(resultData);
+            return true;
+          }
+        } catch (e) {
+          console.error('Error loading shared result:', e);
+        }
+      }
+      return false;
+    }
+
+    // Display a shared result when accessed via QR code
+    function displaySharedResult(resultData) {
+      // Find the matching personality data
+      const personality = victorianPersonalities[resultData.character];
+      if (!personality) {
+        console.error('Character not found:', resultData.character);
+        return;
+      }
+
+      const result = {
+        name: resultData.character,
+        ...personality
+      };
+
+      // Set the stored answers and mood
+      scanMood = resultData.scanMood || '';
+      answers = resultData.answers || [];
+      physiognomySnapshot = resultData.snapshot;
+
+      // Display the result immediately
+      setTimeout(() => {
+        showStage('resultStage');
+        displayResult(result);
+      }, 500);
+    }
+
+    initializeApp();
+
+    // Check for shared result after initialization
+    setTimeout(() => {
+      if (!checkForSharedResult()) {
+        // No shared result, proceed normally
+      }
+    }, 100);
+  </script>
+</body>
+
+</html>
