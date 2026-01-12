@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victorian Quiz - Scannable QR Code Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #120c09 0%, #2a1f18 100%);
+            color: #e8dcc8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: #d4a654;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: #b88643;
+            font-style: italic;
+            margin-bottom: 50px;
+        }
+
+        .result-preview {
+            background: linear-gradient(to bottom, rgba(20, 15, 12, 0.85), rgba(0, 0, 0, 0.95));
+            border: 1px solid rgba(184, 134, 67, 0.2);
+            padding: 60px 40px;
+            border-radius: 8px;
+            position: relative;
+            min-height: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .character-name {
+            font-size: 5rem;
+            color: #d4a654;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .character-subtitle {
+            font-size: 2rem;
+            color: #c9b99a;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .character-description {
+            font-size: 1.2rem;
+            line-height: 1.9;
+            color: #c9b99a;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+            text-align: justify;
+        }
+
+        .traits-display {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .trait-badge {
+            border: 2px solid #8a6230;
+            padding: 12px 25px;
+            color: #d4a654;
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            background: rgba(184, 134, 67, 0.1);
+            border-radius: 4px;
+        }
+
+        /* QR Code Container - Positioned Lower-Right */
+        .qr-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(26, 18, 13, 0.98), rgba(20, 15, 10, 0.98));
+            border: 3px solid #b88643;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.9),
+                0 0 40px rgba(184, 134, 67, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 1s ease-out 0.5s both;
+            z-index: 1000;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .qr-container::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(184, 134, 67, 0.4);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .qr-container:hover {
+            border-color: #d4a654;
+            box-shadow:
+                0 15px 50px rgba(0, 0, 0, 0.95),
+                0 0 50px rgba(184, 134, 67, 0.6),
+                inset 0 1px 2px rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .qr-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            color: #d4a654;
+            text-transform: uppercase;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+            font-weight: 600;
+        }
+
+        .qr-code-wrapper {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow:
+                inset 0 2px 10px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(184, 134, 67, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-caption {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #c9b99a;
+            font-style: italic;
+            line-height: 1.5;
+            max-width: 280px;
+        }
+
+        .qr-id {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: #8a6230;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .info-box {
+            background: rgba(184, 134, 67, 0.15);
+            border: 2px solid #8a6230;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .info-box h3 {
+            color: #d4a654;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .info-box p {
+            line-height: 1.8;
+            color: #c9b99a;
+            margin-bottom: 12px;
+        }
+
+        .info-box code {
+            background: #120c09;
+            padding: 2px 8px;
+            border-radius: 3px;
+            color: #d4a654;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .character-name {
+                font-size: 3rem;
+            }
+
+            .character-subtitle {
+                font-size: 1.5rem;
+            }
+
+            .qr-container {
+                bottom: 20px;
+                right: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-container">
+        <h1>🎭 Your Victorian Analysis 🎭</h1>
+        <p class="subtitle">Personalized Result with Scannable QR Code</p>
+
+        <div class="result-preview">
+            <div class="character-name">Jane Eyre</div>
+            <div class="character-subtitle">"The Moral Compass"</div>
+
+            <div class="character-description">
+                Your character mirrors the indomitable Jane Eyre - possessed of unwavering moral principles
+                tempered by deep compassion. Like Charlotte Brontë's heroine, you refuse to compromise your
+                integrity even when it costs you dearly. You seek authentic connection and will not settle
+                for relationships built on inequality or deception. Your spirit remains resilient through
+                adversity, and you trust your own moral judgment above society's dictates.
+            </div>
+
+            <div class="traits-display">
+                <div class="trait-badge">Principled</div>
+                <div class="trait-badge">Resilient</div>
+                <div class="trait-badge">Independent</div>
+                <div class="trait-badge">Passionate</div>
+            </div>
+
+            <div class="info-box">
+                <h3>📱 Scan Your Personal QR Code</h3>
+                <p>
+                    <strong>Your unique result ID:</strong> <code id="displayResultId">Loading...</code>
+                </p>
+                <p>
+                    This QR code is personalized to your results. Anyone who scans it will see your complete
+                    Victorian personality analysis, including:
+                </p>
+                <ul style="text-align: left; margin-top: 10px; line-height: 2;">
+                    <li>✓ Your character match (Jane Eyre)</li>
+                    <li>✓ All quiz answers and insights</li>
+                    <li>✓ Physiognomy scan results</li>
+                    <li>✓ Distinctive traits analysis</li>
+                    <li>✓ Timestamp of your session</li>
+                </ul>
+                <p style="margin-top: 15px;">
+                    <strong style="color: #d4a654;">Try it:</strong> Use your phone's camera to scan the
+                    QR code in the lower-right corner!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Container - Lower Right -->
+    <div class="qr-container">
+        <div class="qr-header">Your Personal Result</div>
+        <div class="qr-code-wrapper">
+            <canvas id="qrCanvas" width="240" height="240"></canvas>
+        </div>
+        <div class="qr-caption">
+            Scan to view your personalized Victorian analysis
+        </div>
+        <div class="qr-id" id="qrIdDisplay">Generating...</div>
+    </div>
+
+    <!-- Load QRious library for better QR code generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+    <script>
+        // Wait for DOM to be ready
+        window.addEventListener('DOMContentLoaded', function () {
+            // Generate unique result ID
+            const resultId = `VCT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            document.getElementById('displayResultId').textContent = resultId;
+            document.getElementById('qrIdDisplay').textContent = resultId;
+
+            // Create the personalized URL
+            const baseUrl = window.location.href.split('?')[0].replace('qr_code_demo.html', 'vct2.html');
+            const personalizedUrl = `${baseUrl}?result=${resultId}&character=Jane%20Eyre`;
+
+            // Generate the QR Code using QRious
+            try {
+                const qr = new QRious({
+                    element: document.getElementById('qrCanvas'),
+                    value: personalizedUrl,
+                    size: 240,
+                    foreground: '#2a1f18',
+                    background: '#ffffff',
+                    level: 'H'
+                });
+
+                console.log('✅ QR Code generated successfully!');
+                console.log('📱 Scan this QR code with your phone');
+                console.log('🔗 URL:', personalizedUrl);
+            } catch (error) {
+                console.error('❌ Error generating QR code:', error);
+                document.getElementById('qrIdDisplay').textContent = 'Error generating QR code';
+            }
+
+            // Store demo data in localStorage
+            const resultData = {
+                id: resultId,
+                timestamp: new Date().toISOString(),
+                character: "Jane Eyre",
+                subtitle: "The Moral Compass",
+                description: "Your character mirrors the indomitable Jane Eyre - possessed of unwavering moral principles tempered by deep compassion...",
+                traits: ["Principled", "Resilient", "Independent", "Passionate"],
+                scanMood: "Contemplative",
+                answers: [
+                    {
+                        question: "When faced with injustice, you are most likely to:",
+                        answer: "Speak out firmly, even if it means standing alone",
+                        traits: ["principled", "courageous"]
+                    },
+                    {
+                        question: "Your ideal evening would involve:",
+                        answer: "Deep conversation with a kindred spirit",
+                        traits: ["intellectual", "intimate"]
+                    }
+                ],
+                snapshot: null
+            };
+
+            try {
+                localStorage.setItem(`vct_result_${resultId}`, JSON.stringify(resultData));
+                console.log('💾 Demo result saved to localStorage');
+            } catch (e) {
+                console.error('Could not save to localStorage:', e);
+            }
+        });
+    </script>
+</body>
+
+</html>

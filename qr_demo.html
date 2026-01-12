@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Feature Demo - Victorian Quiz</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a120d 0%, #2a1f18 100%);
+            color: #e8dcc8;
+            line-height: 1.8;
+        }
+
+        h1 {
+            color: #d4a654;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #b88643;
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: rgba(42, 31, 24, 0.6);
+            border: 2px solid #8a6230;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        h2 {
+            color: #d4a654;
+            border-bottom: 2px solid #8a6230;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #d4a654;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .code-block {
+            background: #120c09;
+            border: 1px solid #8a6230;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .highlight {
+            color: #d4a654;
+            font-weight: bold;
+        }
+
+        .demo-qr {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .demo-qr img {
+            border: 10px solid #2a1f18;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .step {
+            background: rgba(18, 12, 9, 0.6);
+            border-left: 4px solid #b88643;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
+
+        .step-number {
+            color: #d4a654;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .privacy-note {
+            background: rgba(138, 98, 48, 0.2);
+            border: 2px solid #b88643;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .privacy-note strong {
+            color: #d4a654;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(180deg, #2a1f18 0%, #1a120d 100%);
+            color: #b88643;
+            border: 2px solid #8a6230;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .button:hover {
+            border-color: #d4a654;
+            box-shadow: 0 5px 20px rgba(184, 134, 67, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .centered {
+            text-align: center;
+            margin: 40px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎭 Personalized QR Code System</h1>
+    <p class="subtitle">Victorian Personality Quiz - Technical Demo</p>
+
+    <div class="section">
+        <h2>✨ What's New</h2>
+        <p>Your Victorian Personality Quiz now features a <span class="highlight">unique, personalized QR code</span>
+            for each participant's result page!</p>
+
+        <ul class="feature-list">
+            <li><strong>Facial Snapshot Capture:</strong> Automatically captures during physiognomy scan</li>
+            <li><strong>Unique Result ID:</strong> Every participant gets a unique identifier</li>
+            <li><strong>Comprehensive Data:</strong> Encodes answers, character match, traits, and facial snapshot</li>
+            <li><strong>Victorian Design:</strong> Positioned in lower-right corner with ornate styling</li>
+            <li><strong>Private & Secure:</strong> Results only accessible via unique QR URL</li>
+            <li><strong>Easy Sharing:</strong> Scan to view or share your personalized analysis</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>📋 How It Works</h2>
+
+        <div class="step">
+            <span class="step-number">Step 1:</span> Participant takes the quiz
+            <div class="code-block">• Camera captures facial snapshot during "Capturing countenance..." phase
+                • All quiz answers are recorded
+                • Character match is calculated</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">Step 2:</span> Result page is displayed
+            <div class="code-block">• Unique result ID is generated: VCT-{timestamp}-{random}
+                • All data is packaged and stored in localStorage
+                • QR code is generated with unique URL</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">Step 3:</span> QR code appears
+            <div class="code-block">• Elegant fade-in animation in lower-right corner
+                • Victorian-styled container with gold borders
+                • Ready to scan with any QR reader app</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">Step 4:</span> Share and access results
+            <div class="code-block">• Scan QR code with mobile device
+                • Browser opens unique URL
+                • Result page automatically loads with stored data
+                • Share your Victorian persona with friends!</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔐 Privacy & Security</h2>
+
+        <div class="privacy-note">
+            <strong>Privacy First:</strong> Your implementation prioritizes participant privacy:
+            <br><br>
+            • Each result has a <strong>unique, unguessable ID</strong><br>
+            • Results stored <strong>locally on the device</strong> (demo version)<br>
+            • No external data transmission<br>
+            • Only accessible via the specific QR code URL<br>
+            • No personally identifiable information collected
+        </div>
+
+        <p><strong>For Production:</strong> Consider implementing:</p>
+        <ul class="feature-list">
+            <li>Server-side database storage</li>
+            <li>Encrypted data transmission</li>
+            <li>Result expiration dates (e.g., 30 days)</li>
+            <li>Optional user authentication</li>
+            <li>Privacy policy compliance</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>💻 Technical Details</h2>
+
+        <p><strong>Data Encoded in QR Code:</strong></p>
+        <div class="code-block">
+            URL Format:
+            https://yoursite.com/vct2.html?result=VCT-1704729600000-abc123xyz&character=Jane%20Eyre
+
+            Stored Data Structure:
+            {
+            id: "VCT-1704729600000-abc123xyz",
+            timestamp: "2026-01-08T11:10:06.000Z",
+            character: "Jane Eyre",
+            subtitle: "The Moral Compass",
+            description: "Your character mirrors Jane Eyre...",
+            traits: ["Principled", "Resilient", "Independent", "Passionate"],
+            scanMood: "Contemplative",
+            answers: [ {...}, {...}, ... ],
+            snapshot: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+            }
+        </div>
+
+        <p><strong>Technologies Used:</strong></p>
+        <ul class="feature-list">
+            <li><strong>QRCode.js:</strong> Client-side QR code generation</li>
+            <li><strong>Canvas API:</strong> Facial snapshot capture from video</li>
+            <li><strong>localStorage API:</strong> Client-side data persistence</li>
+            <li><strong>URLSearchParams:</strong> URL parameter parsing</li>
+            <li><strong>Base64 Encoding:</strong> Image data serialization</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🎨 Visual Design</h2>
+
+        <p>The QR code container seamlessly integrates with your Victorian aesthetic:</p>
+
+        <ul class="feature-list">
+            <li><strong>Position:</strong> Fixed lower-right corner (non-intrusive)</li>
+            <li><strong>Colors:</strong> Sepia brown (#2a1f18) and gold (#b88643)</li>
+            <li><strong>Border:</strong> 3px gold with ornate double-border effect</li>
+            <li><strong>Background:</strong> Victorian gradient with blur backdrop</li>
+            <li><strong>Animation:</strong> Smooth 400ms fade-in after result display</li>
+            <li><strong>Hover Effect:</strong> Lifts up with enhanced glow</li>
+            <li><strong>Responsive:</strong> Adapts size for mobile (120px → 180px)</li>
+        </ul>
+
+        <div class="demo-qr">
+            <p style="margin-bottom: 20px;"><em>Example QR Code Appearance:</em></p>
+            <div
+                style="display: inline-block; background: linear-gradient(135deg, rgba(26, 18, 13, 0.98), rgba(20, 15, 10, 0.98)); border: 3px solid #8a6230; padding: 20px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+                <div
+                    style="color: #b88643; font-size: 0.85em; letter-spacing: 0.15em; margin-bottom: 15px; text-transform: uppercase;">
+                    Your Personal Result</div>
+                <div
+                    style="background: white; padding: 10px; border-radius: 4px; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">
+                    [QR Code Appears Here]<br>
+                    180x180px
+                </div>
+                <div style="color: #c9b99a; font-size: 0.75em; font-style: italic; margin-top: 12px;">Scan to view your
+                    personalized analysis</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>✅ Testing Checklist</h2>
+
+        <ul class="feature-list">
+            <li>Test camera permissions on different browsers</li>
+            <li>Verify QR code scans correctly</li>
+            <li>Check localStorage data persistence</li>
+            <li>Test responsive design on mobile devices</li>
+            <li>Verify result sharing functionality</li>
+            <li>Test with/without camera access</li>
+            <li>Confirm Victorian styling across all components</li>
+        </ul>
+    </div>
+
+    <div class="centered">
+        <h2 style="color: #d4a654; margin-bottom: 20px;">🎉 Ready to Experience It!</h2>
+        <p style="margin-bottom: 30px;">The QR code system is fully implemented and integrated into your Victorian
+            Personality Quiz.</p>
+        <a href="vct2.html" class="button">Launch the Quiz →</a>
+        <br>
+        <a href="QR_CODE_IMPLEMENTATION.md" class="button" style="border-color: #6d5530;">View Technical Docs</a>
+    </div>
+
+    <div
+        style="text-align: center; margin-top: 60px; padding-top: 30px; border-top: 2px solid #8a6230; color: #8a6230; font-size: 0.9em;">
+        <p><em>Victorian Personality Quiz - Enhanced with Personalized QR Code Technology</em></p>
+        <p style="margin-top: 10px;">🎭 Discover Your True Nature · Share Your Victorian Soul 🎭</p>
+    </div>
+</body>
+
+</html>
